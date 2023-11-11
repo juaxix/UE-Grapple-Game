@@ -1,0 +1,6 @@
+Source/.vs/
+Source/_ReSharper.Caches/
+Source/Saved/
+Source/Intermediate/
+Source/Binaries/
+*.sln
