@@ -1,8 +1,8 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright 2023 - juaxix [xixgames] & giodestone | All Rights Reserved
 
 #pragma once
 
-#include "Core.h"
+#include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "GrappleComponent.generated.h"
 
@@ -55,20 +55,21 @@ public:
 	FName NoGrappleTag = "NoGrapple"; // Tag of actors not to connect to.
 private:
 	/*Whip Related Variables*/
+	UPROPERTY(Transient)
+	UPrimitiveComponent* WhippedComponent = nullptr;
 	FTimerHandle GrappleTimeToWhipHandle;
 	FTimerHandle GrappleFinishWhippingHandle;
 	bool IsWhipping = false;
 	FVector WhipLocation;
-	UPrimitiveComponent* WhippedComponent;
 	
 	/* Grapple Variables */
 	FTimerHandle StartGrapplingTimerHandle;
 	FTimerHandle GrappleApplyForceInGrappleDirectionHandle;
 
-	float GrappleIncrements;
-	bool IsGrappling = false;
+	float GrappleIncrements = 0.f;
+	bool bIsGrappling = false;
 	bool PreventGrappleCancel = false;
-	float GrappleDistance;
+	float GrappleDistance = 0.f;
 	FVector GrappleToLocation;
 	FVector GrappleStartLocation;
 	
@@ -86,9 +87,6 @@ public:
 	void OnPlayerDied();
 	
 protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
-
 	// Begin Lerping - To be called by time position.
 	UFUNCTION()
 	void GrappleBeginLerping();

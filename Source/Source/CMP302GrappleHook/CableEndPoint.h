@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright 2023 - juaxix [xixgames] & giodestone | All Rights Reserved
 
 #pragma once
 
@@ -13,17 +13,8 @@ class CMP302GRAPPLEHOOK_API ACableEndPoint : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	ACableEndPoint();
 
-	class USceneComponent* AttachmentPoint = nullptr;
-
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
+	UPROPERTY(Transient)
+	USceneComponent* AttachmentPoint = nullptr;
 };

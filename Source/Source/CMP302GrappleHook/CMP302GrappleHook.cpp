@@ -1,4 +1,4 @@
-// Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
+// Copyright 2023 - juaxix [xixgames] & giodestone | All Rights Reserved
 
 #include "CMP302GrappleHook.h"
 #include "Modules/ModuleManager.h"

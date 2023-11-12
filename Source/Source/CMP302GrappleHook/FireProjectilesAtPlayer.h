@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright 2023 - juaxix [xixgames] & giodestone | All Rights Reserved
 
 #pragma once
 
@@ -13,20 +13,20 @@ class CMP302GRAPPLEHOOK_API UFireProjectilesAtPlayer : public UActorComponent
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditDefaultsOnly, Category = Projectile)
-		TSubclassOf<class ACMP302GrappleHookProjectile> ProjectileClass;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Projectile)
+	TSubclassOf<class ACMP302GrappleHookProjectile> ProjectileClass;
 	
 	UPROPERTY(BlueprintReadWrite, Category = "Turret")
-	class UArrowComponent* LookFrom;
+	class UArrowComponent* LookFrom = nullptr;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Turret")
-	class UStaticMeshComponent* Body;
+	class UStaticMeshComponent* Body = nullptr;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Turret")
-	class UStaticMeshComponent* TurretMountLeft;
+	class UStaticMeshComponent* TurretMountLeft = nullptr;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Turret")
-	class UStaticMeshComponent* TurretMountRight;
+	class UStaticMeshComponent* TurretMountRight = nullptr;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Turret")
 	TArray<class UArrowComponent*> FirePoints;
@@ -46,16 +46,13 @@ public:
 protected:
 	FTimerHandle FireProjectileHandle;
 
-	bool IsFiringProjectile = false;
-	int CurrentFirePoint = 0; // For alternating between fire points.
+	bool bIsFiringProjectile = false;
+	int32 CurrentFirePoint = 0; // For alternating between fire points.
 	
 public:	
-	// Sets default values for this component's properties
 	UFireProjectilesAtPlayer();
 
 protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
 
 	// If the turret is upright.
 	UFUNCTION(BlueprintCallable, Category = "Turret")

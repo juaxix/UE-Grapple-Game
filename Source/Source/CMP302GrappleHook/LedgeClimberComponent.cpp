@@ -1,5 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
+// Copyright 2023 - juaxix [xixgames] & giodestone | All Rights Reserved
 
 #include "LedgeClimberComponent.h"
 #include "Components/ArrowComponent.h"
@@ -8,31 +7,20 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "DrawDebugHelpers.h"
 #include "Engine/Engine.h"
-#include "Components/CapsuleComponent.h"
-#include "Camera/CameraComponent.h"
 
-// Sets default values for this component's properties
+
 ULedgeClimberComponent::ULedgeClimberComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
-
-// Called when the game starts
-void ULedgeClimberComponent::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
-
-// Called every frame
 void ULedgeClimberComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	if (IsClimbing)
 	{
-		Climb(); // Climb.
+		Climb();
 	}
 }
 
@@ -63,7 +51,9 @@ void ULedgeClimberComponent::OnPlayerDied()
 void ULedgeClimberComponent::StartClimbing()
 {
 	if (IsClimbing)
+	{
 		return;
+	}
 
 	PlayerCharacter->GetCharacterMovement()->GravityScale = 0.f; // Stop the player from falling.
 
@@ -75,7 +65,9 @@ void ULedgeClimberComponent::StartClimbing()
 void ULedgeClimberComponent::StopClimbing()
 {
 	if (!IsClimbing)
+	{
 		return;
+	}
 	
 	PlayerCharacter->GetCharacterMovement()->GravityScale = 1.f; // Allow the player to fall again.
 
@@ -106,10 +98,10 @@ void ULedgeClimberComponent::Climb()
 	}
 }
 
-bool ULedgeClimberComponent::IsArrowOnLedge(UArrowComponent* arrow, FHitResult& hitResult)
+bool ULedgeClimberComponent::IsArrowOnLedge(UArrowComponent* arrow, FHitResult& hitResult) const
 {
-	FCollisionQueryParams collisionQueryParams;
+	const FCollisionQueryParams CollisionQueryParams;
 	
 	return GetWorld()->LineTraceSingleByChannel(hitResult, arrow->GetComponentLocation(),
-		arrow->GetComponentLocation() + (arrow->GetForwardVector() * MaxDistanceToWallToStartClimbing), LedgeTranceChannel, collisionQueryParams); // Return if the arrow is touching the ledge component.
+		arrow->GetComponentLocation() + (arrow->GetForwardVector() * MaxDistanceToWallToStartClimbing), LedgeTranceChannel, CollisionQueryParams); // Return if the arrow is touching the ledge component.
 }

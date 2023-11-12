@@ -1,4 +1,4 @@
-// Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
+// Copyright 2023 - juaxix [xixgames] & giodestone | All Rights Reserved
 
 using UnrealBuildTool;
 using System.Collections.Generic;
@@ -9,5 +9,7 @@ public class CMP302GrappleHookTarget : TargetRules
 	{
 		Type = TargetType.Game;
 		ExtraModuleNames.Add("CMP302GrappleHook");
+		DefaultBuildSettings = BuildSettingsVersion.Latest;
+		ShadowVariableWarningLevel = WarningLevel.Error;
 	}
 }

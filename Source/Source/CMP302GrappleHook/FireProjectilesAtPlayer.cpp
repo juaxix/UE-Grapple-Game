@@ -1,5 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
+// Copyright 2023 - juaxix [xixgames] & giodestone | All Rights Reserved
 
 #include "FireProjectilesAtPlayer.h"
 #include "GameFramework/Actor.h"
@@ -11,20 +10,11 @@
 #include "Components/StaticMeshComponent.h"
 #include "DrawDebugHelpers.h"
 #include "CMP302GrappleHookProjectile.h"
-#include "Components/SphereComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
-// Sets default values for this component's properties
 UFireProjectilesAtPlayer::UFireProjectilesAtPlayer()
 {
 	PrimaryComponentTick.bCanEverTick = true;
-}
-
-
-// Called when the game starts
-void UFireProjectilesAtPlayer::BeginPlay()
-{
-	Super::BeginPlay();
 }
 
 bool UFireProjectilesAtPlayer::IsUpright()
@@ -38,71 +28,99 @@ void UFireProjectilesAtPlayer::TickComponent(float DeltaTime, ELevelTick TickTyp
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	UWorld* World = GetWorld();
 	if (LookFrom == nullptr || Body == nullptr || TurretMountLeft == nullptr || TurretMountRight == nullptr || FirePoints.Num() < 1)
 	{
 		GEngine->AddOnScreenDebugMessage(INDEX_NONE, 10.f, FColor::Red, TEXT("FireProjectilesAtPlayer doesn't have all of its references to components set. Make sure all are set inside of the construction scrip inside of the Turret Blueprint."));
 		return;
 	}
 	
-	if (!IsUpright()) // Check if turret isnt upright.
+	if (!IsUpright())
+	{
+		// Check if turret isnt upright.
 		return;
+	}
 
-	if (IsFiringProjectile) // Already firing the projectile, don't fire again!
+	if (bIsFiringProjectile)
+	{
+		// Already firing the projectile, don't fire again!
 		return;
+	}
 
-	if (GetWorld()->GetFirstPlayerController() == nullptr) // Safety check for if the player got deleted - No error needed as the lack of a player is already noticeable.
+	if (World->GetFirstPlayerController() == nullptr)
+	{
+		// Safety check for if the player got deleted - No error needed as the lack of a player is already noticeable.
 		return;
+	}
 	
 	/* Check if the player is within the firing angle. */
-	auto playerLocation = GetWorld()->GetFirstPlayerController()->GetCharacter()->GetActorLocation();
-	auto turretLocation = LookFrom->GetComponentLocation();
+	const FVector PlayerLocation = World->GetFirstPlayerController()->GetCharacter()->GetActorLocation();
+	const FVector TurretLocation = LookFrom->GetComponentLocation();
 
-	auto turretToPlayer = playerLocation - turretLocation;
-	turretToPlayer.Normalize(0.f);
+	FVector TurretToPlayer = (PlayerLocation - TurretLocation);
+	TurretToPlayer.Normalize(0.f);
 
-	auto cosOfTurretToPlayer = FVector::DotProduct(turretToPlayer, LookFrom->GetForwardVector()); // Using Cosine rule.
-	if (cosOfTurretToPlayer < FMath::Cos(FMath::DegreesToRadians(LookAngle / 2.f))) // If not in cone of vision.
+	const double CosOfTurretToPlayer = FVector::DotProduct(TurretToPlayer, LookFrom->GetForwardVector()); // Using Cosine rule.
+	if (CosOfTurretToPlayer < FMath::Cos(FMath::DegreesToRadians(LookAngle / 2.f))) 
+	{
+		// If not in cone of vision.
 		return;
+	}
 
 	/* Check if nothing is obstructing path to player. */
-	
 	FHitResult hitResult;
-	auto hitSomething = GetWorld()->LineTraceSingleByChannel(hitResult, LookFrom->GetComponentLocation(), playerLocation, ECC_Visibility);
+	const bool bHitSomething = World->LineTraceSingleByChannel(hitResult, LookFrom->GetComponentLocation(), PlayerLocation, ECC_Visibility);
 
-	if (!hitSomething) //If not obstructed by something, fire projectile.
+	if (!bHitSomething) //If not obstructed by something, fire projectile.
 	{
-		GetWorld()->GetTimerManager().SetTimer(FireProjectileHandle, this, &UFireProjectilesAtPlayer::FireProjectileAtPlayer, FireRateBetweenRounds);
-		IsFiringProjectile = true;
+		World->GetTimerManager().SetTimer(FireProjectileHandle, this, &UFireProjectilesAtPlayer::FireProjectileAtPlayer, FireRateBetweenRounds);
+		bIsFiringProjectile = true;
 	}
 }
 
 void UFireProjectilesAtPlayer::FireProjectileAtPlayer()
 {
-	if (CurrentFirePoint >= FirePoints.Num())
-		CurrentFirePoint = 0;
+	UWorld* World = GetWorld();
+	if (!IsValid(World))
+	{
+		return;
+	}
 
-	auto playerLocation = GetWorld()->GetFirstPlayerController()->GetCharacter()->GetActorLocation();
-	
-	auto* firePointArrow = FirePoints[CurrentFirePoint];
-	auto firePointLocation = firePointArrow->GetComponentLocation();
+	if (CurrentFirePoint >= FirePoints.Num())
+	{
+		CurrentFirePoint = 0;
+	}
+
+	const FVector PlayerLocation = World->GetFirstPlayerController()->GetCharacter()->GetActorLocation();
+	const UArrowComponent* FirePointArrow = FirePoints[CurrentFirePoint];
+	const FVector FirePointLocation = FirePointArrow->GetComponentLocation();
 
 	if (ProjectileClass == nullptr)
 	{
-		GEngine->AddOnScreenDebugMessage(10, 10.f, FColor::Yellow, "Error - projectile set to null at FireProjectilesAtPlayer class (Check Blueprint with item).");
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(10, 10.f, FColor::Yellow, "Error - projectile set to null at FireProjectilesAtPlayer class (Check Blueprint with item).");
+		}
+
 		return;
 	}
-	
-	auto firedProjectile = GetWorld()->SpawnActor<ACMP302GrappleHookProjectile>(ProjectileClass, firePointLocation, firePointArrow->GetComponentRotation());
 
-	auto test = UKismetMathLibrary::FindLookAtRotation(firePointLocation, playerLocation).Vector();
-	if (!test.Normalize(0.f))
+	FActorSpawnParameters ActorSpawnParameters;
+	ActorSpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+	const ACMP302GrappleHookProjectile* FiredProjectile = World->SpawnActor<ACMP302GrappleHookProjectile>(ProjectileClass, FirePointLocation, FirePointArrow->GetComponentRotation(), ActorSpawnParameters);
+
+	FVector TestDirection = UKismetMathLibrary::FindLookAtRotation(FirePointLocation, PlayerLocation).Vector();
+	if (!TestDirection.Normalize(0.f))
 	{
 		return;
 	}
 	
-	Cast<UStaticMeshComponent>(firedProjectile->GetComponentByClass(UStaticMeshComponent::StaticClass()))->AddImpulse(test * FireForce);
-	
+	if (UStaticMeshComponent* Mesh = Cast<UStaticMeshComponent>(FiredProjectile->GetComponentByClass(UStaticMeshComponent::StaticClass())))
+	{
+		Mesh->AddImpulse(TestDirection * FireForce);
+	}
+
 	CurrentFirePoint++;
-	IsFiringProjectile = false;
+	bIsFiringProjectile = false;
 }
 

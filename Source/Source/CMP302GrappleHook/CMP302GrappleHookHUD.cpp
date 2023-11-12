@@ -1,4 +1,4 @@
-// Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
+// Copyright 2023 - juaxix [xixgames] & giodestone | All Rights Reserved
 
 #include "CMP302GrappleHookHUD.h"
 #include "Engine/Canvas.h"
@@ -29,7 +29,7 @@ void ACMP302GrappleHookHUD::DrawHUD()
 										   (Center.Y) );
 
 	// draw the crosshair
-	FCanvasTileItem TileItem( CrosshairDrawPosition, CrosshairTex->Resource, FLinearColor::White);
+	FCanvasTileItem TileItem( CrosshairDrawPosition, CrosshairTex->GetResource(), FLinearColor::White);
 	TileItem.BlendMode = SE_BLEND_Translucent;
 	Canvas->DrawItem( TileItem );
 }

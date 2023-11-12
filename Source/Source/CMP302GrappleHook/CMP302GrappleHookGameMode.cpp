@@ -1,8 +1,7 @@
-// Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
+// Copyright 2023 - juaxix [xixgames] & giodestone | All Rights Reserved
 
 #include "CMP302GrappleHookGameMode.h"
 #include "CMP302GrappleHookHUD.h"
-#include "CMP302GrappleHookCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 
 ACMP302GrappleHookGameMode::ACMP302GrappleHookGameMode()

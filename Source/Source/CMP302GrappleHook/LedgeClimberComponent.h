@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright 2023 - juaxix [xixgames] & giodestone | All Rights Reserved
 
 #pragma once
 
@@ -21,7 +21,7 @@ public:
 	class UArrowComponent* FootArrow = nullptr;
 
 	UPROPERTY()
-	class ACMP302GrappleHookCharacter* PlayerCharacter;
+	class ACMP302GrappleHookCharacter* PlayerCharacter = nullptr;
 	
 	/*User configurable.*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WallClimbing)
@@ -42,15 +42,10 @@ protected:
 	const ECollisionChannel LedgeTranceChannel = ECC_GameTraceChannel2; // Gotten from DefaultEngine.ini file.
 	
 public:	
-	// Sets default values for this component's properties
 	ULedgeClimberComponent();
 
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
 	
 public:	
-	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Ledge Climbing")
@@ -75,5 +70,5 @@ protected:
 	void Climb();
 
 	// Returns true if an arrow is on the ledge.
-	bool IsArrowOnLedge(class UArrowComponent* arrow, FHitResult& hitResult);
+	bool IsArrowOnLedge(class UArrowComponent* arrow, FHitResult& hitResult) const;
 };

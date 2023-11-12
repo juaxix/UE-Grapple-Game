@@ -1,5 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
+// Copyright 2023 - juaxix [xixgames] & giodestone | All Rights Reserved
 
 #include "GrappleComponent.h"
 #include "Engine/World.h"
@@ -11,40 +10,38 @@
 #include "GameFramework/PawnMovementComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "CMP302GrappleHookCharacter.h"
-#include "Components/ArrowComponent.h"
 #include "CableComponent.h"
-#include "PhysicsEngine/PhysicsConstraintComponent.h"
 #include "Components/CapsuleComponent.h"
 
-// Sets default values for this component's properties
 UGrappleComponent::UGrappleComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
 void UGrappleComponent::OnGrappleFired()
 {
-	if (PreventGrappleCancel || IsWhipping) // Don't do anything if not allowed to prevent the cancel, or the grapple is whipping.
+	if (PreventGrappleCancel || IsWhipping)
+	{
+		// Don't do anything if not allowed to prevent the cancel, or the grapple is whipping.
 		return;
+	}
 
-	if (IsGrappling)
+	if (bIsGrappling)
 	{
 		StopLerping(true);
 		return;
 	}
 
 	/* Create line trace. */
-	FVector start = PlayerCamera->GetComponentLocation();
-	FVector forward = PlayerCamera->GetForwardVector();
-	FVector end = (forward * GrappleAndWhipRange) + start;
+	const FVector Start = PlayerCamera->GetComponentLocation();
+	const FVector Forward = PlayerCamera->GetForwardVector();
+	const FVector End = (Forward * GrappleAndWhipRange) + Start;
 
 	FHitResult hitResult;
 	FCollisionQueryParams collisionParams;
 	collisionParams.AddIgnoredActor(PlayerCharacter->GetParentActor()); // Ignore self if hit
 	
-	bool hasHitSomething = GetWorld()->LineTraceSingleByChannel(hitResult, start, end, ECC_Visibility, collisionParams);
+	bool hasHitSomething = GetWorld()->LineTraceSingleByChannel(hitResult, Start, End, ECC_Visibility, collisionParams);
 	if (hasHitSomething)
 	{
 		/*Check that can grapple to this actor.*/
@@ -71,8 +68,11 @@ void UGrappleComponent::OnGrappleFired()
 
 		GrappleDistance = hitResult.Distance; // Save distance for later.
 
-		if (!PlayerCharacter->GetMovementComponent()->IsFlying() && !PlayerCharacter->GetMovementComponent()->IsFalling()) // Launch up if not already floating.
+		if (!PlayerCharacter->GetMovementComponent()->IsFlying() && !PlayerCharacter->GetMovementComponent()->IsFalling())
+		{
+			// Launch up if not already floating.
 			PlayerCharacter->LaunchCharacter(FVector::UpVector * GrappleInitialLaunchVelocity, false, true);
+		}
 		
 		/* Begin grappling in some delay. */
 		GetWorld()->GetTimerManager().SetTimer(StartGrapplingTimerHandle, this, &UGrappleComponent::GrappleBeginLerping, GrappleBeginGrapplingDelay);
@@ -88,17 +88,11 @@ void UGrappleComponent::OnPlayerDied()
 }
 
 
-// Called when the game starts
-void UGrappleComponent::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
 void UGrappleComponent::GrappleBeginLerping()
 {
 	GrappleStartLocation = PlayerCharacter->GetActorLocation(); // Start lerping from here.
 	PreventGrappleCancel = false; // Allow the player to cancel.
-	IsGrappling = true; // Begin Lerping
+	bIsGrappling = true; // Begin Lerping
 
 	GrappleLerpProgress = 0.f;
 	GrappleIncrements = GrappleSpeed / (GrappleToLocation - GrappleStartLocation).Size(); // For a constant velocity.
@@ -111,7 +105,7 @@ void UGrappleComponent::GrappleBeginLerping()
 
 void UGrappleComponent::StopLerping(bool applyVelocity)
 {
-	IsGrappling = false;
+	bIsGrappling = false;
 	Cable->SetVisibility(false);
 
 	PlayerCharacter->GetCharacterMovement()->SetMovementMode(MOVE_Falling);
@@ -119,44 +113,42 @@ void UGrappleComponent::StopLerping(bool applyVelocity)
 	if (GrappleDistance > GrappleStopLerpingAtDistanceFromTarget && applyVelocity)
 	{
 		ApplyVelocityWithRope();
-		return;
-	}		
+	}
 }
 
 void UGrappleComponent::ApplyVelocityWithRope()
 {
 	/*Launch player in direction of grapple.*/
-	auto movementVector = (GrappleToLocation - GrappleStartLocation).GetSafeNormal(0.f);
+	const FVector MovementVector = (GrappleToLocation - GrappleStartLocation).GetSafeNormal(0.f);
 
 	PlayerCharacter->GetCharacterMovement()->SetMovementMode(MOVE_Falling);
 	
-	PlayerCharacter->LaunchCharacter(movementVector * GrappleSpeed, true, true);
+	PlayerCharacter->LaunchCharacter(MovementVector * GrappleSpeed, true, true);
 }
 
 bool UGrappleComponent::IsOverlapCapsuleOverlappingWithAnotherObject()
 {
-	TArray<UPrimitiveComponent*> overlappingComponents;
-	OverlapCapsule->GetOverlappingComponents(overlappingComponents);
+	TArray<UPrimitiveComponent*> OverlappingComponents;
+	OverlapCapsule->GetOverlappingComponents(OverlappingComponents);
 	
-	if (overlappingComponents.Num() > 0)
+	if (!OverlappingComponents.IsEmpty())
 	{
-		for (auto component : overlappingComponents)
+		for (const UPrimitiveComponent* Component : OverlappingComponents)
 		{
-			if (!component->ComponentHasTag("Player"))
+			if (!Component->ComponentHasTag("Player"))
 			{
 				return true;
 			}
 		}
 	}
+
 	return false;
 }
 
 void UGrappleComponent::WhipComponent()
 {	
 	WhippedComponent->AddForceAtLocation((PlayerCamera->GetComponentLocation() - WhipLocation).GetSafeNormal(0.f) * WhipForce, WhipLocation);
-	
 	Cable->SetWorldLocation(Cable->GetComponentLocation()); // Move cable back.
-	
 	GetWorld()->GetTimerManager().SetTimer(GrappleFinishWhippingHandle, this, &UGrappleComponent::FinishWhippingComponent, WhipDelay); // Make th
 }
 
@@ -171,14 +163,14 @@ void UGrappleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (IsGrappling)
+	if (bIsGrappling)
 	{
-		auto newLerpPos = FMath::Lerp(GrappleStartLocation, GrappleToLocation, GrappleLerpProgress); // Where the player will be next.
+		const FVector NewLerpPos = FMath::Lerp(GrappleStartLocation, GrappleToLocation, GrappleLerpProgress); // Where the player will be next.
 
 		/* Check if there will be anything in the way when moving to the location. */
 		FHitResult sweepResult;
-		auto movementVector = (GrappleStartLocation - GrappleToLocation).GetSafeNormal(0.f);
-		PlayerCharacter->SetActorLocation(newLerpPos, true, &sweepResult, ETeleportType::ResetPhysics);
+		// todo auto movementVector = (GrappleStartLocation - GrappleToLocation).GetSafeNormal(0.f);
+		PlayerCharacter->SetActorLocation(NewLerpPos, true, &sweepResult, ETeleportType::ResetPhysics);
 
 		if (sweepResult.IsValidBlockingHit()) // If would hit something on the way.
 		{	

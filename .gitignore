@@ -4,3 +4,4 @@ Source/Saved/
 Source/Intermediate/
 Source/Binaries/
 *.sln
+Source/Build/

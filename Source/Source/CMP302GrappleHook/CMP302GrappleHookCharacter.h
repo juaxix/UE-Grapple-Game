@@ -1,14 +1,14 @@
-// Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
+// Copyright 2023 - juaxix [xixgames] & giodestone | All Rights Reserved
 
 #pragma once
 
-#include "Core.h"
+#include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "CMP302GrappleHookCharacter.generated.h"
 
 class UInputComponent;
 
-UCLASS(config=Game)
+UCLASS(Config=Game)
 class ACMP302GrappleHookCharacter : public ACharacter
 {
 	GENERATED_BODY()
@@ -32,6 +32,7 @@ class ACMP302GrappleHookCharacter : public ACharacter
 	/*-----Custom Components-----*/
 
 	/*Cable*/
+	UPROPERTY(Category = "Cable", EditDefaultsOnly)
 	class UCableComponent* Cable;
 	
 	/*Secondary Collision detection Capsule that is slight bigger than the original.*/
@@ -91,20 +92,23 @@ public:
 	float MaxHealth = 200.f;
 	
 protected:
-	float Health = MaxHealth; // Local health variable
-	bool HasPressedJump = false; // Stop the player for jumping forever.
+	// Local health variable
+	float Health = MaxHealth;
+
+	// Stop the player for jumping forever.
+	bool HasPressedJump = false;
 	
 protected:
 	/** Fires the grapple hook. */
 	void OnFire();
 
 	/* Check if we can climb ledge, and if not then jump. */
-	void Jump() override;
+	virtual void Jump() override;
 
 	/* Stop climbing ledge if already climbing. */
-	void StopJumping() override;
-	
-	void Tick(float DeltaSeconds) override;
+	virtual void StopJumping() override;
+
+	virtual void Tick(float DeltaSeconds) override;
 	
 	/** Handles moving forward/backward */
 	void MoveForward(float Val);
@@ -137,12 +141,8 @@ protected:
 	// End of APawn interface
 
 public:
-	/** Returns Mesh1P subobject **/
 	FORCEINLINE class USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
-	/** Returns FirstPersonCameraComponent subobject **/
 	FORCEINLINE class UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
-
-	/* Returns health - No class other than this should be able to modify it. */
 	UFUNCTION(BlueprintCallable, Category = "Player|Health")
 	float GetHealth();
 	

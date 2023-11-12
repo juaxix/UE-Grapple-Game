@@ -1,26 +1,15 @@
-// Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
+// Copyright 2023 - juaxix [xixgames] & giodestone | All Rights Reserved
 
 #include "CMP302GrappleHookCharacter.h"
-#include "CMP302GrappleHookProjectile.h"
 #include "Animation/AnimInstance.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
-#include "GameFramework/InputSettings.h"
-#include "Kismet/GameplayStatics.h"
-#include "MotionControllerComponent.h"
-#include "DrawDebugHelpers.h"
-#include "TimerManager.h"
-#include "Engine/Engine.h"
 #include "GrappleComponent.h"
 #include "LedgeClimberComponent.h"
-#include "GameFramework/PawnMovementComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/ArrowComponent.h"
 #include "CableComponent.h"
-#include "PhysicsEngine/PhysicsConstraintComponent.h"
-
-DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
 //////////////////////////////////////////////////////////////////////////
 // ACMP302GrappleHookCharacter
@@ -37,7 +26,7 @@ ACMP302GrappleHookCharacter::ACMP302GrappleHookCharacter()
 	// Create a CameraComponent	
 	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
 	FirstPersonCameraComponent->SetupAttachment(GetCapsuleComponent());
-	FirstPersonCameraComponent->SetRelativeLocation(FVector(-39.56f, 1.75f, 64.f)); // Position the camera
+	FirstPersonCameraComponent->SetRelativeLocation(FVector(-39.56, 1.75, 64.0)); // Position the camera
 	FirstPersonCameraComponent->bUsePawnControlRotation = true;
 
 	// Create a mesh component that will be used when being viewed from a '1st person' view (when controlling this pawn)
@@ -46,8 +35,8 @@ ACMP302GrappleHookCharacter::ACMP302GrappleHookCharacter()
 	Mesh1P->SetupAttachment(FirstPersonCameraComponent);
 	Mesh1P->bCastDynamicShadow = false;
 	Mesh1P->CastShadow = false;
-	Mesh1P->SetRelativeRotation(FRotator(1.9f, -19.19f, 5.2f));
-	Mesh1P->SetRelativeLocation(FVector(-0.5f, -4.4f, -155.7f));
+	Mesh1P->SetRelativeRotation(FRotator(1.9, -19.19, 5.2));
+	Mesh1P->SetRelativeLocation(FVector(-0.5, -4.4, -155.7));
 
 	// Create a gun mesh component
 	FP_Gun = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FP_Gun"));
@@ -59,13 +48,11 @@ ACMP302GrappleHookCharacter::ACMP302GrappleHookCharacter()
 
 	FP_MuzzleLocation = CreateDefaultSubobject<UArrowComponent>(TEXT("MuzzleLocation"));
 	FP_MuzzleLocation->SetupAttachment(FP_Gun);
-	FP_MuzzleLocation->SetRelativeLocation(FVector(0.2f, 48.4f, -10.6f));
+	FP_MuzzleLocation->SetRelativeLocation(FVector(0.2, 48.4, -10.6));
 
 	// Default offset from the character location for projectiles to spawn
-	GunOffset = FVector(100.0f, 0.0f, 10.0f);
+	GunOffset = FVector(100.0, 0.0, 10.0);
 
-
-	
 	// Create cable.
 	Cable = CreateDefaultSubobject<UCableComponent>(TEXT("CABLE"));
 	Cable->SetupAttachment(FP_MuzzleLocation);
@@ -89,11 +76,11 @@ ACMP302GrappleHookCharacter::ACMP302GrappleHookCharacter()
 	// Create arrows.
 	ForwardArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("Forward Arrow"));
 	ForwardArrow->SetupAttachment(GetCapsuleComponent());
-	ForwardArrow->SetRelativeLocation(FVector(0.f, 0.f, 35.f));
+	ForwardArrow->SetRelativeLocation(FVector(0.0, 0.0, 35.0));
 	
 	FootArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("Foot Arrow"));
 	FootArrow->SetupAttachment(GetCapsuleComponent());
-	FootArrow->SetRelativeLocation(FVector(0.f, 0.f, -95.f));
+	FootArrow->SetRelativeLocation(FVector(0.0, 0.0, -95.0));
 	
 	// Create ledge climber component and set arrow references.
 	LedgeClimberComponent = CreateDefaultSubobject<ULedgeClimberComponent>(TEXT("LedgeClimberComponent"));
@@ -103,7 +90,6 @@ ACMP302GrappleHookCharacter::ACMP302GrappleHookCharacter()
 
 void ACMP302GrappleHookCharacter::BeginPlay()
 {
-	// Call the base class  
 	Super::BeginPlay();
 
 	//Attach gun mesh component to Skeleton, doing it here because the skeleton is not yet created in the constructor
@@ -181,6 +167,8 @@ void ACMP302GrappleHookCharacter::StopJumping()
 
 void ACMP302GrappleHookCharacter::Tick(float DeltaSeconds)
 {
+	Super::Tick(DeltaSeconds);
+
 	if (Health <= 0.f)
 	{
 		PlayerReset();

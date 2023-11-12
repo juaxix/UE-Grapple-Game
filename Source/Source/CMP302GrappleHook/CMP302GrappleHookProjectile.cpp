@@ -1,10 +1,9 @@
-// Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
+// Copyright 2023 - juaxix [xixgames] & giodestone | All Rights Reserved
 
 #include "CMP302GrappleHookProjectile.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/PlayerController.h"
-#include "CMP302GrappleHookCharacter.h"
 #include "Engine/Engine.h"
 
 ACMP302GrappleHookProjectile::ACMP302GrappleHookProjectile() 
@@ -37,12 +36,10 @@ ACMP302GrappleHookProjectile::ACMP302GrappleHookProjectile()
 void ACMP302GrappleHookProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	// Deal damage to player and destroy.
-	if ((OtherActor != NULL) && (OtherActor != this) && OtherActor->ActorHasTag(PlayerTag) && !OtherActor->ActorHasTag(TurretTag))
+	if (OtherActor != nullptr && OtherActor != this && OtherActor->ActorHasTag(PlayerTag) && !OtherActor->ActorHasTag(TurretTag))
 	{
-		FDamageEvent damageEvent;
-		
-		OtherActor->TakeDamage(DamageToDeal, damageEvent, nullptr, this);
-		
+		const FDamageEvent DamageEvent;
+		OtherActor->TakeDamage(DamageToDeal, DamageEvent, nullptr, this);
 		Destroy();
 	}
 	else if ((OtherActor != this) && (OtherComp != nullptr) && OtherComp->IsSimulatingPhysics()) // Reflect off and destroy.
