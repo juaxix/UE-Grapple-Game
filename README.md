@@ -1,5 +1,9 @@
 # Grapple Game
-![GIF of player fling while using the Grapple Hook](https://raw.githubusercontent.com/juaxix/UE-Grapple-Game/main/Images/GIF%20Flying.gif)
+![New gameplay](https://raw.githubusercontent.com/juaxix/UE-Grapple-Game/main/Images/UE5.gif)
+
+Full video:
+
+https://www.youtube.com/watch?v=dhFJyeOTLFE
 
 Game made in Unreal Engine 5 C++ with a grappling hook which can grapple, and whip objects and turrets; as well as a wall climbing system. 
 
@@ -25,10 +29,6 @@ Changed to Lumen, Nanite and Chaos.
 The key features are outlined below. Functionality is implemented in C++ using Actor Components.
 
 ### Grapple Hook
-![New gameplay](https://raw.githubusercontent.com/juaxix/UE-Grapple-Game/main/Images/UE5.gif)
-Full video:
-https://www.youtube.com/watch?v=dhFJyeOTLFE
-
 ![Player in mid air](https://raw.githubusercontent.com/juaxix/UE-Grapple-Game/main/Images/Player%20Midair.jpg)
 
 The grapple hook moves the player to the position by first checking if the path is valid, making a CableComponent visible, and then moving the player towards the position at a set speed by using interpolation. The movement is interrupted if the player hits anything or if they cancel the grapple. The player keeps the momentum they had. Actors tagged 'NoGrapple' or 'Whipable' cannot be grappled to.
