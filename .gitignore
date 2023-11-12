@@ -1,8 +1,8 @@
-Source/.vs/
-Source/_ReSharper.Caches/
-Source/Saved/
-Source/Intermediate/
-Source/Binaries/
+*/.vs/
+*/_ReSharper.Caches/
+*/Saved/
+*/Intermediate/
+*/Binaries/
+*/Build/
 *.sln
-Source/Build/
 *.vsconfig
