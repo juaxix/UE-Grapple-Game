@@ -17,11 +17,18 @@ Try to get to the end of the level, avoiding the turrets (try to knock them over
 * Left Mouse Button - Fire grapple.
 * Space - Climb.
 
+### Updated 
+Updated to Unreal Engine 5. Made some improvements. 
+Changed to Lumen, Nanite and Chaos. 
 
 ## Key Features
 The key features are outlined below. Functionality is implemented in C++ using Actor Components.
 
 ### Grapple Hook
+![New gameplay](https://raw.githubusercontent.com/juaxix/UE-Grapple-Game/main/Images/UE5.gif)
+Full video:
+https://www.youtube.com/watch?v=dhFJyeOTLFE
+
 ![Player in mid air](https://raw.githubusercontent.com/juaxix/UE-Grapple-Game/main/Images/Player%20Midair.jpg)
 
 The grapple hook moves the player to the position by first checking if the path is valid, making a CableComponent visible, and then moving the player towards the position at a set speed by using interpolation. The movement is interrupted if the player hits anything or if they cancel the grapple. The player keeps the momentum they had. Actors tagged 'NoGrapple' or 'Whipable' cannot be grappled to.
