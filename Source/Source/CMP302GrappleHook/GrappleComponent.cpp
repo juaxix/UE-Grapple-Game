@@ -20,7 +20,7 @@ UGrappleComponent::UGrappleComponent()
 
 void UGrappleComponent::OnGrappleFired()
 {
-	if (PreventGrappleCancel || IsWhipping)
+	if (PreventGrappleCancel || bIsWhipping)
 	{
 		// Don't do anything if not allowed to prevent the cancel, or the grapple is whipping.
 		return;
@@ -32,31 +32,44 @@ void UGrappleComponent::OnGrappleFired()
 		return;
 	}
 
+	if (!IsValid(PlayerCamera) || !IsValid(PlayerCharacter))
+	{
+		return;
+	}
+
+	UWorld* World = GetWorld();
+	if (!IsValid(World))
+	{
+		return;
+	}
+
 	/* Create line trace. */
 	const FVector Start = PlayerCamera->GetComponentLocation();
 	const FVector Forward = PlayerCamera->GetForwardVector();
 	const FVector End = (Forward * GrappleAndWhipRange) + Start;
 
-	FHitResult hitResult;
-	FCollisionQueryParams collisionParams;
-	collisionParams.AddIgnoredActor(PlayerCharacter->GetParentActor()); // Ignore self if hit
+	FHitResult HitResult;
+	FCollisionQueryParams CollisionParams;
+	CollisionParams.AddIgnoredActor(PlayerCharacter->GetParentActor()); // Ignore self if hit
 	
-	bool hasHitSomething = GetWorld()->LineTraceSingleByChannel(hitResult, Start, End, ECC_Visibility, collisionParams);
-	if (hasHitSomething)
+	const bool bHasHitSomething = World->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, CollisionParams);
+	if (bHasHitSomething && IsValid(HitResult.GetActor()))
 	{
 		/*Check that can grapple to this actor.*/
-		if (hitResult.GetActor()->ActorHasTag(NoGrappleTag))
+		if (HitResult.GetActor()->ActorHasTag(NoGrappleTag))
+		{
 			return;
+		}
 		
 		/*Whip Component if its whippable.*/
-		if (hitResult.GetActor()->ActorHasTag(WhipableTag))
+		if (HitResult.GetActor()->ActorHasTag(WhipableTag))
 		{
-			IsWhipping = true;
+			bIsWhipping = true;
 			
-			GetWorld()->GetTimerManager().SetTimer(GrappleTimeToWhipHandle, this, &UGrappleComponent::WhipComponent, WhipDelay); //Whip in a moment so we can lerp across there.
+			World->GetTimerManager().SetTimer(GrappleTimeToWhipHandle, this, &UGrappleComponent::WhipComponent, WhipDelay); //Whip in a moment so we can lerp across there.
 
-			WhippedComponent = hitResult.GetComponent();
-			WhipLocation = hitResult.ImpactPoint;
+			WhippedComponent = HitResult.GetComponent();
+			WhipLocation = HitResult.ImpactPoint;
 
 			Cable->SetVisibility(true);
 			Cable->SetWorldLocation(WhipLocation);
@@ -65,8 +78,7 @@ void UGrappleComponent::OnGrappleFired()
 		}
 
 		/* Otherwise Grapple To Location*/
-
-		GrappleDistance = hitResult.Distance; // Save distance for later.
+		GrappleDistance = HitResult.Distance; // Save distance for later.
 
 		if (!PlayerCharacter->GetMovementComponent()->IsFlying() && !PlayerCharacter->GetMovementComponent()->IsFalling())
 		{
@@ -75,9 +87,9 @@ void UGrappleComponent::OnGrappleFired()
 		}
 		
 		/* Begin grappling in some delay. */
-		GetWorld()->GetTimerManager().SetTimer(StartGrapplingTimerHandle, this, &UGrappleComponent::GrappleBeginLerping, GrappleBeginGrapplingDelay);
+		World->GetTimerManager().SetTimer(StartGrapplingTimerHandle, this, &UGrappleComponent::GrappleBeginLerping, GrappleBeginGrapplingDelay);
 
-		GrappleToLocation = hitResult.Location;
+		GrappleToLocation = HitResult.Location;
 		PreventGrappleCancel = true;
 	}
 }
@@ -90,7 +102,7 @@ void UGrappleComponent::OnPlayerDied()
 
 void UGrappleComponent::GrappleBeginLerping()
 {
-	GrappleStartLocation = PlayerCharacter->GetActorLocation(); // Start lerping from here.
+	GrappleStartLocation = PlayerCharacter->GetPawnViewLocation(); // Start lerping from here.
 	PreventGrappleCancel = false; // Allow the player to cancel.
 	bIsGrappling = true; // Begin Lerping
 
@@ -103,14 +115,14 @@ void UGrappleComponent::GrappleBeginLerping()
 	PlayerCharacter->Falling();
 }
 
-void UGrappleComponent::StopLerping(bool applyVelocity)
+void UGrappleComponent::StopLerping(bool bApplyVelocity)
 {
 	bIsGrappling = false;
 	Cable->SetVisibility(false);
 
 	PlayerCharacter->GetCharacterMovement()->SetMovementMode(MOVE_Falling);
 
-	if (GrappleDistance > GrappleStopLerpingAtDistanceFromTarget && applyVelocity)
+	if (GrappleDistance > GrappleStopLerpingAtDistanceFromTarget && bApplyVelocity)
 	{
 		ApplyVelocityWithRope();
 	}
@@ -154,7 +166,7 @@ void UGrappleComponent::WhipComponent()
 
 void UGrappleComponent::FinishWhippingComponent()
 {
-	IsWhipping = false;
+	bIsWhipping = false;
 	Cable->SetVisibility(false);
 }
 

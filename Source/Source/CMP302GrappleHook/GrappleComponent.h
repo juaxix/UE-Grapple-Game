@@ -59,7 +59,7 @@ private:
 	UPrimitiveComponent* WhippedComponent = nullptr;
 	FTimerHandle GrappleTimeToWhipHandle;
 	FTimerHandle GrappleFinishWhippingHandle;
-	bool IsWhipping = false;
+	bool bIsWhipping = false;
 	FVector WhipLocation;
 	
 	/* Grapple Variables */

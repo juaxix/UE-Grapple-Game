@@ -37,7 +37,7 @@ public:
 	float EndClimbingUpDirectionModifier = 3.f; // How much stronger should be the up vector than the forward vector when the player is launched forward at the end of their climb.
 
 protected:
-	bool IsClimbing = false;
+	bool bIsClimbing = false;
 
 	const ECollisionChannel LedgeTranceChannel = ECC_GameTraceChannel2; // Gotten from DefaultEngine.ini file.
 	
@@ -70,5 +70,5 @@ protected:
 	void Climb();
 
 	// Returns true if an arrow is on the ledge.
-	bool IsArrowOnLedge(class UArrowComponent* arrow, FHitResult& hitResult) const;
+	bool IsArrowOnLedge(const class UArrowComponent* arrow, FHitResult& OutHitResult) const;
 };

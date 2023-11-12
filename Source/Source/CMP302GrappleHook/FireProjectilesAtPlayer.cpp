@@ -35,7 +35,7 @@ void UFireProjectilesAtPlayer::TickComponent(float DeltaTime, ELevelTick TickTyp
 		return;
 	}
 	
-	if (!IsUpright())
+	if (!IsUpright() || !IsValid(LookFrom))
 	{
 		// Check if turret isnt upright.
 		return;
@@ -47,14 +47,15 @@ void UFireProjectilesAtPlayer::TickComponent(float DeltaTime, ELevelTick TickTyp
 		return;
 	}
 
-	if (World->GetFirstPlayerController() == nullptr)
+	ACharacter* Character = IsValid(World->GetFirstPlayerController()) ? World->GetFirstPlayerController()->GetCharacter() : nullptr;
+	if (!IsValid(Character))
 	{
 		// Safety check for if the player got deleted - No error needed as the lack of a player is already noticeable.
 		return;
 	}
 	
 	/* Check if the player is within the firing angle. */
-	const FVector PlayerLocation = World->GetFirstPlayerController()->GetCharacter()->GetActorLocation();
+	const FVector PlayerLocation = Character->GetActorLocation();
 	const FVector TurretLocation = LookFrom->GetComponentLocation();
 
 	FVector TurretToPlayer = (PlayerLocation - TurretLocation);

@@ -8,7 +8,7 @@ public class CMP302GrappleHook : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 		DefaultBuildSettings = BuildSettingsVersion.Latest;
-		ShadowVariableWarningLevel = WarningLevel.Error;
+		IncludeOrderVersion = EngineIncludeOrderVersion.Latest;
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "CableComponent", "UMG" });
 	}
 }

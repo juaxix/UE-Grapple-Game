@@ -3,14 +3,14 @@
 #include "CMP302GrappleHookProjectile.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
+#include "Engine/DamageEvents.h"
 #include "GameFramework/PlayerController.h"
-#include "Engine/Engine.h"
 
 ACMP302GrappleHookProjectile::ACMP302GrappleHookProjectile() 
 {
 	// Use a sphere as a simple collision representation
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
-	CollisionComp->InitSphereRadius(5.0f);
+	CollisionComp->InitSphereRadius(InitialSphereRadius);
 	CollisionComp->BodyInstance.SetCollisionProfileName("Projectile");
 	CollisionComp->OnComponentHit.AddDynamic(this, &ACMP302GrappleHookProjectile::OnHit);	// Set up a notification for when this component hits something blocking
 

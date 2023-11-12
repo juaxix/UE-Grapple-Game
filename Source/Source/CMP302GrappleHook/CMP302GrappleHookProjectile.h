@@ -15,6 +15,9 @@ class ACMP302GrappleHookProjectile : public AActor
 	UPROPERTY(VisibleDefaultsOnly, Category="Projectile")
 	class USphereComponent* CollisionComp;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
+	float InitialSphereRadius = 5.0f;
+
 	/** Projectile movement component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	class UProjectileMovementComponent* ProjectileMovement;
@@ -30,7 +33,6 @@ class ACMP302GrappleHookProjectile : public AActor
 
 	UPROPERTY(VisibleDefaultsOnly, Category = "Damage")
 	FName TurretTag = TEXT("Turret");
-
 public:
 	ACMP302GrappleHookProjectile();
 

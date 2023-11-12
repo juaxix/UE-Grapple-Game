@@ -18,7 +18,7 @@ void ULedgeClimberComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (IsClimbing)
+	if (bIsClimbing)
 	{
 		Climb();
 	}
@@ -50,7 +50,7 @@ void ULedgeClimberComponent::OnPlayerDied()
 
 void ULedgeClimberComponent::StartClimbing()
 {
-	if (IsClimbing)
+	if (bIsClimbing)
 	{
 		return;
 	}
@@ -59,12 +59,12 @@ void ULedgeClimberComponent::StartClimbing()
 
 	PlayerCharacter->GetMovementComponent()->SetPlaneConstraintNormal(FVector(-1.f, 1.f, 0.f)); //Only allow the player to move left and right, and up and down.
 
-	IsClimbing = true;
+	bIsClimbing = true;
 }
 
 void ULedgeClimberComponent::StopClimbing()
 {
-	if (!IsClimbing)
+	if (!bIsClimbing)
 	{
 		return;
 	}
@@ -73,21 +73,21 @@ void ULedgeClimberComponent::StopClimbing()
 
 	PlayerCharacter->GetMovementComponent()->SetPlaneConstraintNormal(FVector(0.f, 0.f, 0.f)); // Allow default movement again.
 
-	IsClimbing = false;
+	bIsClimbing = false;
 }
 
 void ULedgeClimberComponent::Climb()
 {
-	if (IsClimbing)
+	if (bIsClimbing)
 	{
 		/* Launch Character up if is climbing. */
 		PlayerCharacter->LaunchCharacter(FVector(PlayerCharacter->GetActorUpVector() * ClimbSpeed), true, true);
 
 		/* Verify that the player is touching the ledge. */
-		FHitResult arrowHit;
-		if (!IsArrowOnLedge(FootArrow, arrowHit))
+		FHitResult ArrowHit;
+		if (!IsArrowOnLedge(FootArrow, ArrowHit))
 		{
-			if (!IsArrowOnLedge(ForwardArrow, arrowHit))
+			if (!IsArrowOnLedge(ForwardArrow, ArrowHit))
 			{
 				StopClimbing();	
 			
@@ -98,10 +98,11 @@ void ULedgeClimberComponent::Climb()
 	}
 }
 
-bool ULedgeClimberComponent::IsArrowOnLedge(UArrowComponent* arrow, FHitResult& hitResult) const
+bool ULedgeClimberComponent::IsArrowOnLedge(const UArrowComponent* InArrow, FHitResult& OutHitResult) const
 {
 	const FCollisionQueryParams CollisionQueryParams;
 	
-	return GetWorld()->LineTraceSingleByChannel(hitResult, arrow->GetComponentLocation(),
-		arrow->GetComponentLocation() + (arrow->GetForwardVector() * MaxDistanceToWallToStartClimbing), LedgeTranceChannel, CollisionQueryParams); // Return if the arrow is touching the ledge component.
+	return GetWorld()->LineTraceSingleByChannel(OutHitResult, InArrow->GetComponentLocation(),
+		InArrow->GetComponentLocation() + (InArrow->GetForwardVector() * MaxDistanceToWallToStartClimbing), 
+		LedgeTranceChannel, CollisionQueryParams); // Return if the arrow is touching the ledge component.
 }

@@ -57,7 +57,7 @@ ACMP302GrappleHookCharacter::ACMP302GrappleHookCharacter()
 	Cable = CreateDefaultSubobject<UCableComponent>(TEXT("CABLE"));
 	Cable->SetupAttachment(FP_MuzzleLocation);
 	Cable->SetVisibility(false); // Hide in game for now.
-	
+
 	// Mark the base capsule as overlap tag.
 	GetCapsuleComponent()->SetGenerateOverlapEvents(false);
 	

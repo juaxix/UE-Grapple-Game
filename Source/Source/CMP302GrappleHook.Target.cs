@@ -10,6 +10,6 @@ public class CMP302GrappleHookTarget : TargetRules
 		Type = TargetType.Game;
 		ExtraModuleNames.Add("CMP302GrappleHook");
 		DefaultBuildSettings = BuildSettingsVersion.Latest;
-		ShadowVariableWarningLevel = WarningLevel.Error;
+		IncludeOrderVersion = EngineIncludeOrderVersion.Latest;
 	}
 }
