@@ -1,4 +1,4 @@
-# Grapple Game
+# Grappling Hook Game
 ![New gameplay](https://raw.githubusercontent.com/juaxix/UE-Grapple-Game/main/Images/UE5.gif)
 
 Full video:
